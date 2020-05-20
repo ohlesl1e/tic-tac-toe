@@ -2,9 +2,9 @@ import React from 'react';
 import './App.css';
 import axios from 'axios';
 import { connect } from 'react-redux'
+import { updatePlayerId } from './redux/actions/notesActions';
 
-const App = ({ gameState, ws }) => {
-  const [playerId, setPlayerId] = React.useState(null);
+const App = ({ gameState, playerId, ws, dispatch }) => {
   const [winner, setWinner] = React.useState(null);
   const [showId, setshowId] = React.useState(false)
 
@@ -14,7 +14,7 @@ const App = ({ gameState, ws }) => {
       .then(res => {
         console.log(res.data)
         setWinner(null)
-        setPlayerId(null)
+        dispatch(updatePlayerId(1))
       })
     setTimeout(() => {
       setshowId(false)
@@ -25,9 +25,6 @@ const App = ({ gameState, ws }) => {
     axios.get(`/api/play?playerId=${playerId}&position=${i}`)
       .then(res => {
         console.log(res.data)
-        if (res.data.playerId !== 0) {
-          setPlayerId(res.data.playerId)
-        }
         if (res.data.winner) {
           setWinner(res.data.winner)
         }
@@ -57,7 +54,8 @@ const App = ({ gameState, ws }) => {
 }
 
 const mapStateToProps = state => ({
-  gameState: state.notesReducer.gameState
+  gameState: state.notesReducer.gameState,
+  playerId: state.notesReducer.playerId
 })
 
 export default connect(mapStateToProps)(App);

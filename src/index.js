@@ -8,7 +8,7 @@ import rootReducer from './redux/reducers/rootReducer';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { setActiveUsers } from './redux/actions/userActions';
-import { updateGameState } from './redux/actions/notesActions';
+import { updateGameState, updatePlayerId } from './redux/actions/notesActions';
 
 const store = createStore(rootReducer);
 const ws = new WebSocket('ws://localhost:4000')
@@ -20,6 +20,16 @@ ws.onopen = () => {
 ws.onmessage = message => {
   const messageObject = JSON.parse(message.data)
   console.log(messageObject)
+  let count = 0
+  for (let i = 0; i < messageObject.gameState.length; i++) {
+    if (messageObject.gameState[i] === '') count++
+  }
+  console.log(count)
+  if (count % 2 === 0) {
+    store.dispatch(updatePlayerId(2))
+  } else {
+    store.dispatch(updatePlayerId(1))
+  }
   switch (messageObject.type) {
     case 'UPDATE_GAME_STATE':
       store.dispatch(updateGameState(messageObject.gameState))
@@ -33,7 +43,7 @@ ws.onmessage = message => {
 ReactDOM.render(
   <Provider store={store}>
     <Router>
-      <App ws={ws}/>
+      <App ws={ws} />
     </Router>
   </Provider>
   ,

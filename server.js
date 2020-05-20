@@ -7,6 +7,12 @@ const wss = new WebSocket.Server({ port: 4000 });
 
 wss.on('connection', ws => {
   console.log('someone has connected')
+  broadcastGameState()
+
+  ws.on('close', () => {
+    console.log('connection closed');
+    gameState = ['', '', '', '', '', '', '', '', '',]
+  })
 })
 
 let gameState = ['', '', '', '', '', '', '', '', '',];
@@ -43,32 +49,36 @@ const checkWinner = game => {
   return null
 }
 
-const broadcastGameState = () =>{
+const broadcastGameState = () => {
   console.log(gameState)
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({
-          type: 'UPDATE_GAME_STATE',
-          gameState,
-        }))
+      client.send(JSON.stringify({
+        type: 'UPDATE_GAME_STATE',
+        gameState,
+      }))
     }
-})
+  })
 }
 
 app.get('/api/play', (req, res) => {
   console.log(req.query)
   let playerId = 0
-  if (req.query.playerId === 'null') {
-    playerId = 1
-  } else if(req.query.playerId === '1') {
-    playerId = 2
-  } else {
-    playerId = 1
+  if (gameState[req.query.position] === '') {
+    if (req.query.playerId === 'null') {
+      gameState[req.query.position] = 1
+      playerId = 2
+    } else if (req.query.playerId === '1') {
+      gameState[req.query.position] = parseInt(req.query.playerId)
+      playerId = 2
+    } else {
+      gameState[req.query.position] = parseInt(req.query.playerId)
+      playerId = 1
+    }
   }
 
-  gameState[req.query.position] = playerId
-  const winner = parseInt(checkWinner(gameState))
   broadcastGameState()
+  const winner = parseInt(checkWinner(gameState))
   res.send({ playerId, winner });
 })
 
