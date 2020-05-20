@@ -1,13 +1,13 @@
 const DEFAULT_STATE = {
-  notes: ['test'],
+  gameState: ['', '', '', '', '', '', '', '', '',],
 };
 
 const notesReducer = (state = DEFAULT_STATE, action) => {
   switch (action.type) {
-    case 'UPDATE_NOTES':
+    case 'UPDATE_GAME_STATE':
       return {
         ...state,
-        notes: action.notes,
+        gameState: action.gameState,
       };
     default:
       return state;

@@ -1,4 +1,4 @@
-export const updateNotes = notes => ({
-  type: 'UPDATE_NOTES',
-  notes,
+export const updateGameState = gameState => ({
+  type: 'UPDATE_GAME_STATE',
+  gameState,
 });
