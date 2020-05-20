@@ -21,7 +21,7 @@ const App = ({ gameState, playerId, ws, dispatch }) => {
     }, 2000);
   };
 
-  const play = async i => {
+  const play = i => {
     axios.get(`/api/play?playerId=${playerId}&position=${i}`)
       .then(res => {
         console.log(res.data)
